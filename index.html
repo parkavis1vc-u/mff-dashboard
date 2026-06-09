@@ -340,7 +340,7 @@ const state={pack:{page:1,filtered:[]},order:{page:1,filtered:[]}};
 
 const fmt=n=>n==null?'—':Number(n).toLocaleString('en-IN');
 const fmtF=n=>n==null?'—':Number(n).toFixed(2);
-const fmtDW=n=>(n===null||n===undefined||n==='')?'—':(Number(n)*100).toFixed(2)+'%';
+const fmtDW=n=>(n===null||n===undefined||n==='')?'—':(Number(n)*100).toFixed(4)+'%';
 const fmtCr=n=>{if(n==null)return'—';const v=Number(n);if(v>=1e7)return'₹'+(v/1e7).toFixed(2)+' Cr';if(v>=1e5)return'₹'+(v/1e5).toFixed(2)+' L';return'₹'+fmt(v);};
 const TIER_COLORS={bronze:'#f59e0b',silver:'#94a3b8',gold:'#eab308',diamond:'#3b82f6'};
 
@@ -388,7 +388,7 @@ function renderDetailPage(prefix,filtered,page){
   const rows=filtered.slice((page-1)*limit,page*limit);
   const sumDrr=filtered.reduce((a,r)=>a+(Number(r.drr)||0),0);
   const sumGmvPd=filtered.reduce((a,r)=>a+(Number(r.gmv_pd)||0),0);
-  const sumDw=filtered.length?filtered.reduce((a,r)=>a+(Number(r.dw)||0),0)/filtered.length:0;
+  const sumDw=filtered.reduce((a,r)=>a+(Number(r.dw)||0),0);
   renderStats(prefix,{total,subtotals:{sum_drr:sumDrr,sum_gmv_pd:sumGmvPd,sum_dw:sumDw}});
   renderTable(prefix,rows);
   renderPagination(prefix,{page,pages,total,limit},pg=>prefix==='pack'?loadPackData(pg):loadOrderData(pg));
@@ -442,13 +442,13 @@ function buildSummaryFromRows(rows,statusFilter,tierFilter){
   });
   const map={};
   filtered.forEach(r=>{const t=(r.darwin_tier||'unknown').toLowerCase();if(!map[t])map[t]={darwin_tier:r.darwin_tier||t,locs:new Set(),sum_drr:0,sum_gmv_pd:0,sum_dw:0,cnt:0};map[t].locs.add(r.location_id);map[t].sum_drr+=Number(r.drr)||0;map[t].sum_gmv_pd+=Number(r.gmv_pd)||0;map[t].sum_dw+=Number(r.dw)||0;map[t].cnt++;});
-  return Object.values(map).map(v=>({darwin_tier:v.darwin_tier,unique_locations:v.locs.size,sum_drr:v.sum_drr,sum_gmv_pd:v.sum_gmv_pd,sum_dw:v.sum_dw/Math.max(1,v.cnt)})).sort((a,b)=>a.darwin_tier.localeCompare(b.darwin_tier));
+  return Object.values(map).map(v=>({darwin_tier:v.darwin_tier,unique_locations:v.locs.size,sum_drr:v.sum_drr,sum_gmv_pd:v.sum_gmv_pd,sum_dw:v.sum_dw})).sort((a,b)=>a.darwin_tier.localeCompare(b.darwin_tier));
 }
 function buildCumulative(packRows,orderRows,statusFilter,tierFilter){
   const all=[...packRows,...orderRows].filter(r=>{if(statusFilter&&r.last_action_status!==statusFilter)return false;if(tierFilter&&(r.darwin_tier||'').toLowerCase()!==tierFilter)return false;return true;});
   const map={};
   all.forEach(r=>{const t=(r.darwin_tier||'unknown').toLowerCase();if(!map[t])map[t]={darwin_tier:r.darwin_tier||t,locs:new Set(),sum_drr:0,sum_gmv_pd:0,sum_dw:0,cnt:0};map[t].locs.add(r.location_id);map[t].sum_drr+=Number(r.drr)||0;map[t].sum_gmv_pd+=Number(r.gmv_pd)||0;map[t].sum_dw+=Number(r.dw)||0;map[t].cnt++;});
-  return Object.values(map).map(v=>({darwin_tier:v.darwin_tier,unique_locations:v.locs.size,sum_drr:v.sum_drr,sum_gmv_pd:v.sum_gmv_pd,sum_dw:v.sum_dw/Math.max(1,v.cnt)})).sort((a,b)=>a.darwin_tier.localeCompare(b.darwin_tier));
+  return Object.values(map).map(v=>({darwin_tier:v.darwin_tier,unique_locations:v.locs.size,sum_drr:v.sum_drr,sum_gmv_pd:v.sum_gmv_pd,sum_dw:v.sum_dw})).sort((a,b)=>a.darwin_tier.localeCompare(b.darwin_tier));
 }
 
 function renderSummaryTab(){
