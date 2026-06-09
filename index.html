@@ -533,10 +533,19 @@ function colsToRows(data){
 
 async function init(){
   try{
-    const res=await fetch('data/dashboard_data.json?t='+Date.now());
-    if(!res.ok)throw new Error('HTTP '+res.status);
-    const d=await res.json();
-    PACK_ROWS=colsToRows(d.pack);ORDER_ROWS=colsToRows(d.order);SUMMARY=d.summary||{};
+    // Fetch 3 separate files in parallel (avoids single large file / git push timeout)
+    const t=Date.now();
+    const [packRes,orderRes,sumRes]=await Promise.all([
+      fetch('data/pack_data.json?t='+t),
+      fetch('data/order_data.json?t='+t),
+      fetch('data/summary.json?t='+t),
+    ]);
+    if(!packRes.ok)throw new Error('pack_data.json HTTP '+packRes.status);
+    if(!orderRes.ok)throw new Error('order_data.json HTTP '+orderRes.status);
+    if(!sumRes.ok)throw new Error('summary.json HTTP '+sumRes.status);
+    const [packData,orderData,sumData]=await Promise.all([packRes.json(),orderRes.json(),sumRes.json()]);
+    PACK_ROWS=colsToRows(packData);ORDER_ROWS=colsToRows(orderData);SUMMARY=sumData.summary||{};
+    const d={updated:sumData.updated||''};
     document.getElementById('last-refreshed-ts').textContent=d.updated||'Unknown';
 
     const packTiers=[...new Set(PACK_ROWS.map(r=>r.darwin_tier).filter(Boolean))].sort();

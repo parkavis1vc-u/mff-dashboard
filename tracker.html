@@ -154,7 +154,7 @@ function buildTable(rows, cols){
 
 async function load(){
   try{
-    const url = 'data/dashboard_data.json?t='+Date.now();
+    const url = 'data/summary.json?t='+Date.now();
     const res  = await fetch(url);
     if(!res.ok) throw new Error('HTTP '+res.status);
     const d    = await res.json();
