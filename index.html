@@ -340,7 +340,7 @@ const state={pack:{page:1,filtered:[]},order:{page:1,filtered:[]}};
 
 const fmt=n=>n==null?'—':Number(n).toLocaleString('en-IN');
 const fmtF=n=>n==null?'—':Number(n).toFixed(2);
-const fmtDW=n=>n==null?'—':(Number(n)*100).toFixed(2)+'%';
+const fmtDW=n=>(n===null||n===undefined||n===''||n===0||n==='0')?'—':(Number(n)*100).toFixed(2)+'%';
 const fmtCr=n=>{if(n==null)return'—';const v=Number(n);if(v>=1e7)return'₹'+(v/1e7).toFixed(2)+' Cr';if(v>=1e5)return'₹'+(v/1e5).toFixed(2)+' L';return'₹'+fmt(v);};
 const TIER_COLORS={bronze:'#f59e0b',silver:'#94a3b8',gold:'#eab308',diamond:'#3b82f6'};
 
