@@ -508,14 +508,15 @@ function refreshCurrentTab(){if(currentTab==='pack')loadPackData(state.pack.page
 function clearFilters(p){
   document.getElementById(p+'-loc').value='';
   document.getElementById(p+'-sel').value='';
-  ['status','tier','rel'].forEach(f=>{const id=`ms_${p}_${f}`;document.querySelectorAll(`#opts_${id} input`).forEach(cb=>cb.checked=false);updateMSLabel(id,f==='status'?'All Statuses':f==='tier'?'All Tiers':'All Reliability');});
+  const filterMap={status:'All Statuses',tier:'All Tiers',rel:'All Reliability',seller:'All Sellers'};
+  Object.entries(filterMap).forEach(([f,placeholder])=>{const id=`ms_${p}_${f}`;document.querySelectorAll(`#opts_${id} input`).forEach(cb=>cb.checked=false);updateMSLabel(id,placeholder);});
   if(p==='pack')loadPackData(1);else loadOrderData(1);
 }
 
 function downloadFiltered(prefix){
   const rows=prefix==='pack'?state.pack.filtered:state.order.filtered;
   if(!rows||!rows.length){alert('No records to download.');return;}
-  const cols=['location_id','seller_id','last_action_status','darwin_tier','reliability_check','reliability_breach','upper_limit','phi','fulfilment_capacity','lower_limit','current_cap','gmv','units','dw','gmv_pd','drr'];
+  const cols=['location_id','seller_id','last_action_status','darwin_tier','seller_status','reliability_check','reliability_breach','upper_limit','phi','fulfilment_capacity','lower_limit','current_cap','gmv','units','dw','gmv_pd','drr'];
   const csv=[cols.join(','),...rows.map(r=>cols.map(c=>{const v=r[c]??'';return typeof v==='string'&&v.includes(',')? `"${v}"`:v;}).join(','))].join('\n');
   const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`MFF_${prefix}_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 }
