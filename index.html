@@ -164,6 +164,7 @@ tr:last-child td{border-bottom:none;}
         <div class="filter-group"><label>Last Action Status</label><div class="ms-wrap" id="ms-pack-status"></div></div>
         <div class="filter-group"><label>Darwin Tier</label><div class="ms-wrap" id="ms-pack-tier"></div></div>
         <div class="filter-group"><label>Reliability</label><div class="ms-wrap" id="ms-pack-rel"></div></div>
+        <div class="filter-group"><label>Seller Status</label><div class="ms-wrap" id="ms-pack-seller"></div></div>
         <div style="display:flex;gap:8px;align-self:flex-end;">
           <button class="btn-apply" onclick="loadPackData(1)">Apply</button>
           <button class="btn-clear" onclick="clearFilters('pack')">Clear</button>
@@ -208,6 +209,7 @@ tr:last-child td{border-bottom:none;}
         <div class="filter-group"><label>Last Action Status</label><div class="ms-wrap" id="ms-order-status"></div></div>
         <div class="filter-group"><label>Darwin Tier</label><div class="ms-wrap" id="ms-order-tier"></div></div>
         <div class="filter-group"><label>Reliability</label><div class="ms-wrap" id="ms-order-rel"></div></div>
+        <div class="filter-group"><label>Seller Status</label><div class="ms-wrap" id="ms-order-seller"></div></div>
         <div style="display:flex;gap:8px;align-self:flex-end;">
           <button class="btn-apply" onclick="loadOrderData(1)">Apply</button>
           <button class="btn-clear" onclick="clearFilters('order')">Clear</button>
@@ -368,12 +370,14 @@ function applyFilters(rows,prefix){
   const statuses=getMSValues(`ms-${prefix}-status`);
   const tiers=getMSValues(`ms-${prefix}-tier`);
   const rels=getMSValues(`ms-${prefix}-rel`);
+  const sellerStatuses=getMSValues(`ms-${prefix}-seller`);
   return rows.filter(r=>{
     if(loc&&!(r.location_id||'').toLowerCase().includes(loc))return false;
     if(sel&&!(r.seller_id||'').toLowerCase().includes(sel))return false;
     if(statuses.length&&!statuses.includes(r.last_action_status||''))return false;
     if(tiers.length&&!tiers.includes((r.darwin_tier||'').toLowerCase()))return false;
     if(rels.length&&!rels.includes(r.reliability_check||''))return false;
+    if(sellerStatuses.length&&!sellerStatuses.includes(r.seller_status||''))return false;
     return true;
   });
 }
@@ -556,9 +560,11 @@ async function init(){
     createMultiSelect('ms-pack-status','All Statuses',['RTS_ACTIVE','RTS_PENDING'].map(v=>({value:v,label:v})),()=>loadPackData(1));
     createMultiSelect('ms-pack-tier','All Tiers',packTiers.map(v=>({value:v.toLowerCase(),label:v.charAt(0).toUpperCase()+v.slice(1)})),()=>loadPackData(1));
     createMultiSelect('ms-pack-rel','All Reliability',packRels.map(v=>({value:v,label:v})),()=>loadPackData(1));
+    createMultiSelect('ms-pack-seller','All Sellers',[{value:'Active',label:'Active'},{value:'Inactive',label:'Inactive'}],()=>loadPackData(1));
     createMultiSelect('ms-order-status','All Statuses',['RTS_ACTIVE','RTS_PENDING'].map(v=>({value:v,label:v})),()=>loadOrderData(1));
     createMultiSelect('ms-order-tier','All Tiers',orderTiers.map(v=>({value:v.toLowerCase(),label:v.charAt(0).toUpperCase()+v.slice(1)})),()=>loadOrderData(1));
     createMultiSelect('ms-order-rel','All Reliability',orderRels.map(v=>({value:v,label:v})),()=>loadOrderData(1));
+    createMultiSelect('ms-order-seller','All Sellers',[{value:'Active',label:'Active'},{value:'Inactive',label:'Inactive'}],()=>loadOrderData(1));
 
     loadPackData(1);
     ['pack-loc','pack-sel'].forEach(id=>document.getElementById(id)?.addEventListener('keydown',e=>{if(e.key==='Enter')loadPackData(1);}));
