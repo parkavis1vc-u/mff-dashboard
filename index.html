@@ -393,7 +393,8 @@ function renderDetailPage(prefix,filtered,page){
   const sumDrr=filtered.reduce((a,r)=>a+(Number(r.drr)||0),0);
   const sumGmvPd=filtered.reduce((a,r)=>a+(Number(r.gmv_pd)||0),0);
   const sumDw=filtered.reduce((a,r)=>a+(Number(r.dw)||0),0);
-  renderStats(prefix,{total,subtotals:{sum_drr:sumDrr,sum_gmv_pd:sumGmvPd,sum_dw:sumDw}});
+  const uniqueSellers=new Set(filtered.map(r=>r.seller_id).filter(Boolean)).size;
+  renderStats(prefix,{total,subtotals:{sum_drr:sumDrr,sum_gmv_pd:sumGmvPd,sum_dw:sumDw,unique_sellers:uniqueSellers}});
   renderTable(prefix,rows);
   renderPagination(prefix,{page,pages,total,limit},pg=>prefix==='pack'?loadPackData(pg):loadOrderData(pg));
 }
@@ -402,6 +403,7 @@ function renderStats(prefix,res){
   const s=res.subtotals||{};
   document.getElementById(prefix+'-stats').innerHTML=`
     <div class="stat-chip"><div class="stat-icon" style="background:#dbeafe;">📋</div><div><div class="val" style="color:var(--blue);">${fmt(res.total)}</div><div class="lbl">Filtered Records</div></div></div>
+    <div class="stat-chip"><div class="stat-icon" style="background:#e0f2fe;">🧑‍💼</div><div><div class="val" style="color:#0284c7;">${fmt(s.unique_sellers||0)}</div><div class="lbl">Unique Sellers</div></div></div>
     <div class="stat-chip"><div class="stat-icon" style="background:#fff7ed;">🎯</div><div><div class="val" style="color:var(--orange);">${fmt(Math.round(s.sum_drr||0))}</div><div class="lbl">Sum DRR</div></div></div>
     <div class="stat-chip"><div class="stat-icon" style="background:#dcfce7;">💰</div><div><div class="val" style="color:var(--green);">${fmtCr(s.sum_gmv_pd||0)}</div><div class="lbl">Sum GMV/Day</div></div></div>
     <div class="stat-chip"><div class="stat-icon" style="background:#f3e8ff;">📊</div><div><div class="val" style="color:var(--purple);">${((s.sum_dw||0)*100).toFixed(2)}%</div><div class="lbl">Sum DW %</div></div></div>`;
