@@ -188,7 +188,8 @@ tr:last-child td{border-bottom:none;}
         <div class="table-scroll"><table><thead><tr>
           <th>Location ID</th><th>Seller ID</th><th>Status</th><th>Darwin Tier</th>
           <th>Reliability</th><th class="num-right">DBD Breach %</th>
-          <th class="num-right">Upper Limit</th><th class="num-right">PHI</th>
+          <th class="num-right">DC Value</th><th class="num-right">Upper Limit</th>
+          <th class="num-right">Lower Limit</th><th class="num-right">PHI</th>
           <th class="num-right">Fulfilment Cap.</th>
           <th class="num-right">Current Cap</th>
           <th class="num-right">DW %</th><th class="num-right">GMV/Day (₹)</th><th class="num-right">DRR</th>
@@ -233,7 +234,8 @@ tr:last-child td{border-bottom:none;}
         <div class="table-scroll"><table><thead><tr>
           <th>Location ID</th><th>Seller ID</th><th>Status</th><th>Darwin Tier</th>
           <th>Reliability</th><th class="num-right">DBD Breach %</th>
-          <th class="num-right">Upper Limit</th><th class="num-right">PHI</th>
+          <th class="num-right">DC Value</th><th class="num-right">Upper Limit</th>
+          <th class="num-right">Lower Limit</th><th class="num-right">PHI</th>
           <th class="num-right">Fulfilment Cap.</th>
           <th class="num-right">Current Cap</th>
           <th class="num-right">DW %</th><th class="num-right">GMV/Day (₹)</th><th class="num-right">DRR</th>
@@ -419,7 +421,9 @@ function renderTable(prefix,rows){
     <td>${tierBadge(r.darwin_tier)}</td>
     <td>${reliabilityBadge(r.reliability_check)}</td>
     <td class="num-right">${breachBar(r.reliability_breach)}</td>
+    <td class="num-right">${fmtF(r.dc_value)}</td>
     <td class="num-right">${fmtF(r.upper_limit)}</td>
+    <td class="num-right">${fmtF(r.lower_limit)}</td>
     <td class="num-right">${fmt(r.phi)}</td>
     <td class="num-right">${fmt(r.fulfilment_capacity)}</td>
     <td class="num-right">${fmt(r.current_cap)}</td>
@@ -517,7 +521,7 @@ function clearFilters(p){
 function downloadFiltered(prefix){
   const rows=prefix==='pack'?state.pack.filtered:state.order.filtered;
   if(!rows||!rows.length){alert('No records to download.');return;}
-  const cols=['location_id','seller_id','last_action_status','darwin_tier','seller_status','reliability_check','reliability_breach','upper_limit','phi','fulfilment_capacity','current_cap','gmv','units','dw','gmv_pd','drr'];
+  const cols=['location_id','seller_id','last_action_status','darwin_tier','seller_status','reliability_check','reliability_breach','dc_value','upper_limit','lower_limit','phi','fulfilment_capacity','current_cap','gmv','units','dw','gmv_pd','drr'];
   const csv=[cols.join(','),...rows.map(r=>cols.map(c=>{const v=r[c]??'';return typeof v==='string'&&v.includes(',')? `"${v}"`:v;}).join(','))].join('\n');
   const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`MFF_${prefix}_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 }
